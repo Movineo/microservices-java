@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/integration_db
+    username: postgres
+    password: password
+google:
+  maps:
+    api-key: your_google_maps_api_key
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

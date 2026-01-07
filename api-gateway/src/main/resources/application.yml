@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:https://config-p2p-travel.onrender.com
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: https://eureka-p2p-travel.onrender.com/eureka/
+    registry-fetch-interval-seconds: 30
+    instance-info-replication-interval-seconds: 30
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+jwt:
+  secret: ${JWT_SECRET:4d9c7e3a2b1f6c8d0e4a9b2f5c7e1d3a6b8f2c4e9a1d7b3f5c6e8a2d4f9b1c7}
+  expiration: 900

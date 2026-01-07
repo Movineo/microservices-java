@@ -1,0 +1,86 @@
+  spring:
+    application:
+      name: realtime-service
+    config:
+      import: optional:configserver:${CONFIG_SERVER_URL:https://config-p2p-travel.onrender.com}
+    datasource:
+      url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/realtime_db}
+      username: ${DATASOURCE_USERNAME:postgres}
+      password: ${DATASOURCE_PASSWORD:postgres}
+      driver-class-name: org.postgresql.Driver
+    jpa:
+      hibernate:
+        ddl-auto: validate
+      show-sql: false
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: true
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+    kafka:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        acks: all
+        retries: 3
+        batch-size: 16384
+        buffer-memory: 33554432
+        linger-ms: 5
+      consumer:
+        group-id: realtime-service-group
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        enable-auto-commit: false
+        max-poll-records: 100
+        fetch-max-wait: 500
+    data:
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
+
+  server:
+    port: ${SERVER_PORT:8083}
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: ${EUREKA_SERVER_URL:https://eureka-p2p-travel.onrender.com/eureka/}
+      registry-fetch-interval-seconds: 30
+      instance-info-replication-interval-seconds: 30
+    instance:
+      lease-renewal-interval-in-seconds: 30
+      lease-expiration-duration-in-seconds: 90
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics
+
+  realtime:
+    websocket:
+      tracking-endpoint: /ws/tracking
+      notification-endpoint: /ws/notifications
+      allowed-origins: ${WEBSOCKET_ALLOWED_ORIGINS:http://localhost:3000,https://yourfrontend.com}
+    tracking:
+      location-update-interval-seconds: 5
+      location-precision: 8
+      proximity-search-radius-km: 2
+    geohash:
+      default-precision: 7
+    cache:
+      vehicle-locations-ttl-seconds: 120
+      trip-status-ttl-seconds: 300
+    security:
+      jwt:
+        secret: ${JWT_SECRET:KenyanTransportSecretKeyForJWTAuthenticationInP2PTravelApp}
+        expiration: 900
+
+  kafka:
+    topics:
+      trip-events: trip-events
+      vehicle-location-updates: vehicle-location-updates

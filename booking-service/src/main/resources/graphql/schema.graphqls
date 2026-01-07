@@ -1,0 +1,346 @@
+type Query {
+    # Enhanced route queries with ETA calculations
+    routes(
+        startLocation: String!
+        endLocation: String!
+        startLatitude: Float
+        startLongitude: Float
+        endLatitude: Float
+        endLongitude: Float
+        providerType: String
+        departureTime: String
+        passengerCount: Int
+    ): [EnhancedRoute]
+
+    # Real-time ETA calculation
+    calculateETA(
+        startLatitude: Float!
+        startLongitude: Float!
+        endLatitude: Float!
+        endLongitude: Float!
+        departureTime: String
+    ): ETAResult
+
+    # Smart recommendations
+    routeRecommendations(
+        userId: String!
+        startLocation: String!
+        endLocation: String!
+        startLatitude: Float
+        startLongitude: Float
+        endLatitude: Float
+        endLongitude: Float
+        providerType: String
+    ): [RouteRecommendation]
+
+    providerRecommendations(
+        userId: String!
+        providerType: String!
+    ): [ProviderRecommendation]
+
+    timeRecommendations(
+        startLatitude: Float!
+        startLongitude: Float!
+        endLatitude: Float!
+        endLongitude: Float!
+        preferredTime: String!
+    ): [TimeRecommendation]
+
+    # Traffic and conditions
+    trafficConditions(partition: String!): TrafficConditions
+
+    # Existing queries enhanced
+    providers(providerType: String): [Provider]
+    availableVehicles(minCapacity: Int, providerId: ID): [Vehicle]
+
+    # Trip tracking
+    trip(id: ID!): Trip
+    userTrips(userId: String!): [Trip]
+}
+
+type Mutation {
+    # Booking operations
+    processBooking(input: BookingInput!): BookingResponse
+    updateTripStatus(tripId: ID!, status: TripStatus!): Trip
+
+    # Real-time updates
+    updateDriverLocation(
+        driverId: ID!
+        latitude: Float!
+        longitude: Float!
+        speed: Float
+    ): Boolean
+}
+
+# Enhanced Route with ETA and traffic data
+type EnhancedRoute {
+    id: ID!
+    startLocation: String!
+    endLocation: String!
+    startLatitude: Float
+    startLongitude: Float
+    endLatitude: Float
+    endLongitude: Float
+    distanceKm: Float!
+    estimatedDurationMinutes: Int!
+    baseFare: Float!
+
+    # Advanced ETA features
+    realTimeETA: ETAResult
+    trafficAdjustedFare: Float!
+    surgeMultiplier: Float!
+    confidence: Float!
+
+    # Traffic and conditions
+    trafficCondition: String
+    congestionLevel: Float
+
+    # Alternative options
+    alternativeRoutes: [AlternativeRoute]
+
+    isActive: Boolean!
+    provider: Provider!
+    createdAt: String!
+    updatedAt: String
+}
+
+# ETA calculation result
+type ETAResult {
+    estimatedTimeMinutes: Float!
+    estimatedArrival: String!
+    distance: Float!
+    confidence: Float!
+    alternativeRoutes: [AlternativeRoute]
+    trafficConditions: String
+}
+
+# Alternative route suggestion
+type AlternativeRoute {
+    estimatedTimeMinutes: Float!
+    distance: Float!
+    reason: String!
+    fareEstimate: Float
+    trafficCondition: String
+}
+
+# Smart recommendation types
+type RouteRecommendation {
+    route: EnhancedRoute!
+    estimatedFare: Float!
+    recommendedDepartureTime: String
+    reason: String!
+    score: Float!
+}
+
+type ProviderRecommendation {
+    provider: Provider!
+    usageCount: Int!
+    userAverageRating: Float!
+    reason: String!
+    score: Float!
+}
+
+type TimeRecommendation {
+    recommendedTime: String!
+    reason: String!
+    score: Float!
+    potentialSavings: Float!
+}
+
+# Traffic conditions
+type TrafficConditions {
+    partition: String!
+    condition: String!
+    speedRatio: Float!
+    timestamp: String!
+    averageSpeed: Float
+    congestionLevel: Float
+}
+
+# Enhanced entities
+type Provider {
+    id: ID!
+    name: String!
+    phoneNumber: String!
+    email: String
+    providerType: ProviderType!
+    licenseNumber: String!
+    rating: Float
+    totalReviews: Int!
+
+    # Real-time data
+    realTimeRating: Float
+    activeVehicles: Int
+    averageResponseTime: Float
+
+    # Performance metrics
+    onTimePerformance: Float
+    cancellationRate: Float
+
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String
+}
+
+type Vehicle {
+    id: ID!
+    plateNumber: String!
+    model: String!
+    make: String!
+    year: Int
+    capacity: Int!
+    status: VehicleStatus!
+
+    # Real-time location
+    currentLatitude: Float
+    currentLongitude: Float
+    currentSpeed: Float
+    heading: Float
+
+    # Performance data
+    fuelEfficiency: Float
+    maintenanceScore: Float
+
+    isActive: Boolean!
+    driver: Driver
+    provider: Provider!
+    createdAt: String!
+    updatedAt: String
+}
+
+type Driver {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    phoneNumber: String!
+    email: String
+    licenseNumber: String!
+    rating: Float
+    totalReviews: Int!
+
+    # Performance metrics
+    completedTrips: Int
+    onTimePerformance: Float
+    safetyScore: Float
+
+    # Current status
+    isOnline: Boolean
+    currentLatitude: Float
+    currentLongitude: Float
+
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String
+}
+
+# Trip with real-time tracking
+type Trip {
+    id: ID!
+    bookingId: String!
+    userId: String!
+    phoneNumber: String!
+    status: TripStatus!
+
+    # Route information
+    route: EnhancedRoute!
+    vehicle: Vehicle!
+    driver: Driver
+
+    # Fare details
+    totalFare: Float!
+    surgeMultiplier: Float!
+    specialRequests: String
+
+    # Location tracking
+    pickupLocation: String!
+    pickupLatitude: Float
+    pickupLongitude: Float
+    dropoffLocation: String!
+    dropoffLatitude: Float
+    dropoffLongitude: Float
+
+    # Time tracking
+    scheduledPickupTime: String
+    actualPickupTime: String
+    estimatedArrivalTime: String
+    actualArrivalTime: String
+
+    # Real-time updates
+    currentETA: ETAResult
+    realTimeLocation: Location
+
+    # Performance
+    rating: Float
+    feedback: String
+
+    createdAt: String!
+    updatedAt: String
+}
+
+# Real-time location data
+type Location {
+    latitude: Float!
+    longitude: Float!
+    speed: Float
+    heading: Float
+    accuracy: Float
+    timestamp: String!
+}
+
+# Booking input and response
+input BookingInput {
+    userId: String!
+    phoneNumber: String!
+    startLocation: String!
+    endLocation: String!
+    startLatitude: Float
+    startLongitude: Float
+    endLatitude: Float
+    endLongitude: Float
+    preferredDateTime: String
+    passengerCount: Int
+    providerType: String
+    specialRequests: String
+}
+
+type BookingResponse {
+    success: Boolean!
+    message: String!
+    trip: Trip
+    estimatedFare: Float
+    eta: ETAResult
+}
+
+# Enhanced enums
+enum ProviderType {
+    MATATU
+    TAXI
+    MOTORBIKE
+    BRT
+    EV
+}
+
+enum VehicleStatus {
+    AVAILABLE
+    IN_TRANSIT
+    MAINTENANCE
+    INACTIVE
+    OUT_OF_SERVICE
+}
+
+enum TripStatus {
+    PENDING
+    CONFIRMED
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+    NO_SHOW
+}
+
+enum TrafficCondition {
+    FREE_FLOW
+    LIGHT_TRAFFIC
+    MODERATE_TRAFFIC
+    HEAVY_TRAFFIC
+    SEVERE_CONGESTION
+}

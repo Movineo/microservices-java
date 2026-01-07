@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/arieri-s-world/config-repo
+          default-label: main
+          clone-on-start: true
+          timeout: 10
+          username: ${GITHUB_USERNAME}
+          password: ${GITHUB_PAT}
+  security:
+    user:
+      name: config-user
+      password: config-password
+server:
+  port: 8888
+eureka:
+  client:
+    service-url:
+      defaultZone: https://${EUREKA_HOSTNAME}/eureka/
+    registry-fetch-interval-seconds: 30
+    instance-info-replication-interval-seconds: 30
+    initial-instance-info-replication-interval-seconds: 40
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

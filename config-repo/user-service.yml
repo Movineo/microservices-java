@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user_db
+    username: postgres
+    password: password
+  redis:
+    host: localhost
+    port: 6379
+kafka:
+  bootstrap-servers: localhost:9092
+  topics:
+    user-events: user-events
+    booking-events: booking-events
+    payment-events: payment-events
+    trip-events: trip-events
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

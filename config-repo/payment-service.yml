@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_db
+    username: postgres
+    password: password
+kafka:
+  bootstrap-servers: localhost:9092
+  topics:
+    payment-events: payment-events
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

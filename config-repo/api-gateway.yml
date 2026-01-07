@@ -1,0 +1,147 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Fallback Route
+        - id: fallback
+          uri: forward:/fallback
+          predicates:
+            - Path=/fallback/**
+      # Commented out routes for unregistered services
+      # - id: user-service-public
+      #   uri: lb://user-service
+      #   predicates:
+      #     - Path=/users/signup,/users/login,/users/verify-otp,/users/refresh
+      #   filters:
+      #     - AddRequestHeader=X-Service,user-service
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: userServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: user-service-secure
+      #   uri: lb://user-service
+      #   predicates:
+      #     - Path=/users/**
+      #     - Method=GET,PUT,DELETE
+      #   filters:
+      #     - AddRequestHeader=X-Service,user-service
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: userServiceSecureCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: booking-service-django
+      #   uri: lb://booking-service-django
+      #   predicates:
+      #     - Path=/bookings/**
+      #     - Path=/graphql/routes
+      #     - NotPath=/bookings/internal/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,booking-service-django
+      #     - name: RequestRateLimiter
+      #       args:
+      #         redis-rate-limiter.replenishRate: 10
+      #         redis-rate-limiter.burstCapacity: 20
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: bookingServiceDjangoCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: booking-service-core
+      #   uri: lb://booking-service-core
+      #   predicates:
+      #     - Path=/bookings/internal/**,/graphql/routes
+      #   filters:
+      #     - AddRequestHeader=X-Service,booking-service-core
+      #     - name: RequestRateLimiter
+      #       args:
+      #         redis-rate-limiter.replenishRate: 5
+      #         redis-rate-limiter.burstCapacity: 10
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: bookingServiceCoreCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: payment-service
+      #   uri: lb://payment-service
+      #   predicates:
+      #     - Path=/payments/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,payment-service
+      #     - name: RequestRateLimiter
+      #       args:
+      #         redis-rate-limiter.replenishRate: 10
+      #         redis-rate-limiter.burstCapacity: 20
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: paymentServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: feedback-service
+      #   uri: lb://feedback-service
+      #   predicates:
+      #     - Path=/feedback/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,feedback-service
+      #     - name: RequestRateLimiter
+      #       args:
+      #         redis-rate-limiter.replenishRate: 10
+      #         redis-rate-limiter.burstCapacity: 20
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: feedbackServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: realtime-service
+      #   uri: lb://realtime-service
+      #   predicates:
+      #     - Path=/ws/tracking/**,/ws/notifications/**,/tracking/**,/alerts/**,/emergency/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,realtime-service
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: realtimeServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: integration-service
+      #   uri: lb://integration-service
+      #   predicates:
+      #     - Path=/integration/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,integration-service
+      #     - name: RequestRateLimiter
+      #       args:
+      #         redis-rate-limiter.replenishRate: 5
+      #         redis-rate-limiter.burstCapacity: 10
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: integrationServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      #
+      # - id: chat-service
+      #   uri: lb://chat-service
+      #   predicates:
+      #     - Path=/ws/chat/**,/chat/**
+      #   filters:
+      #     - AddRequestHeader=X-Service,chat-service
+      #     - name: CircuitBreaker
+      #       args:
+      #         name: chatServiceCircuitBreaker
+      #         fallbackUri: forward:/fallback
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 5
+            redis-rate-limiter.burstCapacity: 10
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
